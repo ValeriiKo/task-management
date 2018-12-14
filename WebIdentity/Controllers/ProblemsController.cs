@@ -29,10 +29,6 @@ namespace WebIdentity.Controllers
         public async Task<IActionResult> Hot()
         {
             var hotTasks = _context.Problem.ToListAsync().Result.Where(p => (p.DateEnd.Date == DateTime.Now.Date) && (p.DateEnd.AddHours(-2) < DateTime.Now));
-            //foreach(var h in hotTasks){
-            //    if (h.DateEnd.Date == DateTime.Now.Date)
-            //        h.ManagerId = "";
-            //}
             return View("Index", (object)hotTasks);
         }
 
@@ -74,16 +70,18 @@ namespace WebIdentity.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ProblemViewModel problemVM)        //[Bind("Id,Name,DateBegin,DateEnd,Status,ManagerId")]
+        public async Task<IActionResult> Create(ProblemViewModel problemVM)       
         {
             if (ModelState.IsValid)
             {
+                var managers = _context.Manager.ToListAsync().Result;
                 _context.Add(new Problem {
                     Name = problemVM.Name,
                     DateBegin = problemVM.DateBegin,
                     DateEnd = problemVM.DateEnd,
                     Status = problemVM.Status,
-                    ManagerId = problemVM.SelectedManagerId
+                    ManagerId = problemVM.SelectedManagerId,
+                    ManagerName = managers.Where(m => m.Id == problemVM.SelectedManagerId).First().Name
                 });
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

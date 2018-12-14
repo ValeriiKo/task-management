@@ -52,7 +52,7 @@
                     @Html.DisplayFor(modelItem => item.Status)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Manager.Name)
+                    @Html.DisplayFor(modelItem => item.ManagerName)
                 </td>
                 <td>
                     @if (@UserManager.GetUserId(User) != null && @UserManager.GetUserId(User) == item.ManagerId)
