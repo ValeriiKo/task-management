@@ -22,7 +22,18 @@ namespace WebIdentity.Controllers
         // GET: Problems
         public async Task<IActionResult> Index()
         {
+            var listTasks = _context.Problem.ToListAsync().Result;
             return View(await _context.Problem.ToListAsync());
+        }
+
+        public async Task<IActionResult> Hot()
+        {
+            var hotTasks = _context.Problem.ToListAsync().Result.Where(p => (p.DateEnd.Date == DateTime.Now.Date) && (p.DateEnd.AddHours(-2) < DateTime.Now));
+            //foreach(var h in hotTasks){
+            //    if (h.DateEnd.Date == DateTime.Now.Date)
+            //        h.ManagerId = "";
+            //}
+            return View("Index", (object)hotTasks);
         }
 
         // GET: Problems/Details/5
@@ -46,7 +57,16 @@ namespace WebIdentity.Controllers
         // GET: Problems/Create
         public IActionResult Create()
         {
-            return View();
+            var managers = _context.Manager.ToListAsync().Result;
+            var model = new ProblemViewModel
+            {
+                Managers = managers.Select(x => new SelectListItem
+                {
+                    Value = x.Id,
+                    Text = x.Name
+                })
+            };
+            return View(model);
         }
 
         // POST: Problems/Create
@@ -54,15 +74,21 @@ namespace WebIdentity.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,DateBegin,DateEnd,Status")] Problem problem)
+        public async Task<IActionResult> Create(ProblemViewModel problemVM)        //[Bind("Id,Name,DateBegin,DateEnd,Status,ManagerId")]
         {
             if (ModelState.IsValid)
             {
-                _context.Add(problem);
+                _context.Add(new Problem {
+                    Name = problemVM.Name,
+                    DateBegin = problemVM.DateBegin,
+                    DateEnd = problemVM.DateEnd,
+                    Status = problemVM.Status,
+                    ManagerId = problemVM.SelectedManagerId
+                });
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(problem);
+            return View(problemVM);
         }
 
         // GET: Problems/Edit/5

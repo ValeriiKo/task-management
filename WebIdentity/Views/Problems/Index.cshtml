@@ -1,5 +1,10 @@
 ﻿@model IEnumerable<WebIdentity.Models.Problem>
 
+@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<Manager> SignInManager
+@inject UserManager<Manager> UserManager
+
 @{
     ViewData["Title"] = "Index";
 }
@@ -24,30 +29,42 @@
             <th>
                 @Html.DisplayNameFor(model => model.Status)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Manager.Name)
+            </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateBegin)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateEnd)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateBegin)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateEnd)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Status)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Manager.Name)
+                </td>
+                <td>
+                    @if (@UserManager.GetUserId(User) != null && @UserManager.GetUserId(User) == item.ManagerId)
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> 
+                    }
+                    else
+                    { 
+                        <p>Only for owner of task</p>
+                    }
+                </td >
+            </tr >
+        }
+</tbody>
 </table>
