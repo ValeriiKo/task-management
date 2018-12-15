@@ -28,7 +28,8 @@ namespace WebIdentity.Controllers
 
         public async Task<IActionResult> Hot()
         {
-            var hotTasks = _context.Problem.ToListAsync().Result.Where(p => (p.DateEnd.Date == DateTime.Now.Date) && (p.DateEnd.AddHours(-2) < DateTime.Now));
+            var hotTasks = _context.Problem.ToListAsync().Result.Where(p => 
+            (p.DateEnd.Date == DateTime.Now.Date) && (p.DateEnd.AddHours(-2) < DateTime.Now) && (p.DateEnd > DateTime.Now));
             return View("Index", (object)hotTasks);
         }
 
